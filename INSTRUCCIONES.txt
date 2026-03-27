@@ -1,0 +1,1 @@
+SISTEMA CREADO CON ÉXITO. Para jugar, simplemente coloca el archivo 'mslug.zip' dentro de la carpeta 'juegos' y lanza el servidor local (Live Server).

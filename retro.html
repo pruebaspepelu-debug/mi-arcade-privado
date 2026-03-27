@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Legado Retro - Alcalá de Henares</title>
+    <style>
+        :root { --neon-green: #00ff9d; --neon-blue: #00d4ff; --wood: #2c1e14; }
+        body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        header { width: 100%; padding: 20px; text-align: center; background: linear-gradient(to bottom, #1a1a1a, #0f0f0f); border-bottom: 2px solid var(--neon-blue); }
+        .main-container { display: flex; gap: 20px; padding: 20px; max-width: 1200px; }
+        
+        .game-screen { background: #000; width: 640px; height: 480px; border: 5px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 20px rgba(0,212,255,0.2); }
+        .controls { display: flex; flex-direction: column; gap: 15px; }
+        .btn-save { background: var(--neon-green); color: black; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #00a365; }
+        .btn-load { background: var(--neon-blue); color: black; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #0088a3; }
+        .btn-save:active, .btn-load:active { transform: translateY(4px); box-shadow: none; }
+
+        .library { width: 100%; padding: 20px; background: var(--wood); border-top: 10px solid #1a110a; display: flex; gap: 20px; overflow-x: auto; }
+        .game-card { min-width: 120px; text-align: center; font-size: 0.8em; cursor: pointer; }
+        .game-card img { width: 100%; border-radius: 5px; filter: grayscale(30%); transition: 0.3s; }
+        .game-card:hover img { filter: grayscale(0%); transform: scale(1.05); }
+
+        .rooms-area { width: 90%; margin-top: 30px; padding: 20px; background: #1a1a1a; border-radius: 15px; }
+        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .room-card { background: #252525; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--neon-blue); position: relative; }
+        .status { color: var(--neon-green); font-size: 0.7em; font-weight: bold; }
+        .btn-add-room { background: white; color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; float: right; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 style="margin:0; letter-spacing: 2px;">BIBLIOTECA DE LEYENDAS RETRO</h1>
+</header>
+
+<div class="main-container">
+    <div class="game-screen">
+        <p id="game-status">SISTEMA PREPARADO - SELECCIONA UN JUEGO</p>
+    </div>
+
+    <div class="controls">
+        <button class="btn-save" onclick="saveGame()">💾 GUARDAR ESTADO (F5)</button>
+        <button class="btn-load" onclick="loadGame()">📂 CARGAR ESTADO (F8)</button>
+        <div id="save-indicator" style="font-size: 0.8em; color: gray; margin-top: 10px;">Último guardado: Nunca</div>
+    </div>
+</div>
+
+<div class="library">
+    <div class="game-card"><img src="https://m.media-amazon.com/images/I/51p6v4P3ZOL.jpg"><p>Super Mario Bros.</p></div>
+    <div class="game-card"><img src="https://m.media-amazon.com/images/I/51f9F9W8O7L.jpg"><p>The Legend of Zelda</p></div>
+    <div class="game-card"><img src="https://m.media-amazon.com/images/I/51X1-yvU1XL.jpg"><p>Sonic the Hedgehog</p></div>
+    <div class="game-card"><img src="https://m.media-amazon.com/images/I/51A9A9K8A9L.jpg"><p>Pokémon Rojo</p></div>
+</div>
+
+<div class="rooms-area">
+    <button class="btn-add-room" onclick="addRoom()">+ CREAR NUEVA SALA</button>
+    <h3 style="margin:0;">SALAS ABIERTAS</h3>
+    <div class="rooms-grid" id="rooms-grid">
+        <div class="room-card">
+            <span class="status">● ACTIVA</span>
+            <h4>SALA ALCALÁ</h4>
+            <p style="font-size: 0.8em; color: #888;">Juego: Tetris | Jugadores: 1/2</p>
+        </div>
+        <div class="room-card">
+            <span class="status">● ACTIVA</span>
+            <h4>SALA MADRID</h4>
+            <p style="font-size: 0.8em; color: #888;">Juego: Super Mario | Jugadores: 3/4</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function saveGame() {
+        const timestamp = new Date().toLocaleTimeString();
+        localStorage.setItem('retroSave', 'Progreso Guardado a las ' + timestamp);
+        document.getElementById('save-indicator').innerText = 'Último guardado: ' + timestamp;
+        alert('Partida guardada localmente con éxito.');
+    }
+
+    function loadGame() {
+        const data = localStorage.getItem('retroSave');
+        if (data) {
+            document.getElementById('game-status').innerText = 'CARGANDO: ' + data;
+            alert('Cargando progreso...');
+        } else {
+            alert('No hay partidas guardadas en este equipo.');
+        }
+    }
+
+    function addRoom() {
+        const grid = document.getElementById('rooms-grid');
+        const name = prompt("Nombre de la sala:");
+        const game = prompt("Juego a jugar:");
+        if(name && game) {
+            const newRoom = document.createElement('div');
+            newRoom.className = 'room-card';
+            newRoom.innerHTML = `<span class="status" style="color:orange;">● ESPERANDO</span><h4>${name}</h4><p style="font-size: 0.8em; color: #888;">Juego: ${game} | Jugadores: 1/4</p>`;
+            grid.appendChild(newRoom);
+        }
+    }
+</script>
+
+</body>
+</html>

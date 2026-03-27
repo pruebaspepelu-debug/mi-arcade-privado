@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Web App Capable tags for mobile shortcuts -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Arcade Privado - Biblioteca</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Teko:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top, #1a0f18 0%, #050510 100%);
+            color: #fff;
+            overflow-x: hidden;
+            font-family: 'Teko', sans-serif;
+        }
+
+        /* --- STYLES FOR BIBLIOTECA --- */
+        #library-view {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1.title {
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37; /* Burnished gold */
+            text-shadow: 0 4px 10px rgba(212, 175, 55, 0.4), 0 0 20px rgba(200, 30, 30, 0.8);
+            font-size: 1.5rem; /* Adjusted for Press Start 2P proportions */
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+            line-height: 1.5;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: #e2e8f0;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 5px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Console Dashboard & Save System */
+        :root { --neon-green: #00ff9d; --neon-blue: #00d4ff; }
+        .dashboard-container { display: flex; gap: 20px; padding: 20px 0; justify-content: center; align-items: stretch; margin-bottom: 40px; }
+        
+        .game-screen { background: #000; width: 640px; height: 480px; border: 5px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 20px rgba(0,212,255,0.2); flex-shrink: 0; }
+        .game-status { color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; text-shadow: 0 0 10px #00d4ff; text-align: center; line-height: 1.5; }
+        
+        .controls-panel { display: flex; flex-direction: column; gap: 15px; justify-content: center; }
+        .btn-save { background: var(--neon-green); color: black; border: none; padding: 15px 25px; font-family: 'Teko', sans-serif; font-size: 1.5rem; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #00a365; transition: transform 0.1s; display: flex; align-items: center; gap: 8px;}
+        .btn-load { background: var(--neon-blue); color: black; border: none; padding: 15px 25px; font-family: 'Teko', sans-serif; font-size: 1.5rem; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #0088a3; transition: transform 0.1s; display: flex; align-items: center; gap: 8px;}
+        .btn-save:active, .btn-load:active { transform: translateY(4px); box-shadow: none; }
+
+
+        /* Bookshelf (Grid) */
+        .bookshelf {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+            perspective: 1000px;
+        }
+
+        .game-cover {
+            background: linear-gradient(135deg, #2a2a35 0%, #15151e 100%);
+            border: 2px solid #333;
+            border-radius: 8px;
+            aspect-ratio: 3/4;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,150,255,0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-cover::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 30px rgba(100, 200, 255, 0.4);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .game-cover:hover {
+            transform: translateY(-10px) rotateY(4deg) scale(1.05);
+            border-color: #64c8ff;
+            box-shadow: 0 15px 30px rgba(100,200,255,0.2), 0 0 25px rgba(100,200,255,0.15);
+            z-index: 10;
+        }
+        
+        .game-cover:hover::before { opacity: 1; }
+
+        .cover-icon { font-size: 4rem; margin-bottom: 10px; z-index: 1; text-shadow: 0 4px 8px rgba(0,0,0,0.8); }
+        .cover-title { font-size: 1.6rem; font-weight: bold; text-align: center; z-index: 1; color: #fff; line-height: 1.1; padding: 0 15px; }
+        .cover-system { font-size: 1.2rem; color: #d4af37; margin-top: 5px; z-index: 1; letter-spacing: 1px; }
+
+        /* Salas Abiertas Section */
+        .salas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .sala-card {
+            background: rgba(40, 10, 20, 0.6);
+            border: 1px solid #8b0000;
+            border-top: 3px solid #dc2626;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            transition: background 0.2s;
+            cursor: default;
+        }
+
+        .sala-card:hover { background: rgba(80, 20, 30, 0.8); }
+        
+        .sala-info h4 { margin: 0; font-size: 1.5rem; color: #fca5a5; letter-spacing: 0.5px; }
+        .sala-info p { margin: 0; font-size: 1.3rem; color: #94a3b8; }
+        .sala-players { background: #000; padding: 5px 12px; border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; color: #4ade80; border: 1px solid #333; margin-bottom: 10px; display: inline-block; }
+
+        /* Voice Switch Controls - Retro Radio Style */
+        .voice-panel { margin-top: 10px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); display: flex; gap: 10px; align-items: center; }
+        .btn-voice { background: linear-gradient(to bottom, #cc0000, #880000); color: white; border: 2px solid #330000; padding: 6px 12px; font-family: monospace; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 4px; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3), 0 4px 0 #4a0000; text-transform: uppercase; transition: all 0.1s; }
+        .btn-voice:active { transform: translateY(4px); box-shadow: none; }
+        .btn-mute { background: linear-gradient(to bottom, #777, #444); color: white; border: 2px solid #222; padding: 6px 12px; font-family: monospace; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 4px; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3), 0 4px 0 #1a1a1a; text-transform: uppercase; transition: all 0.1s; }
+        .btn-mute:active { transform: translateY(4px); box-shadow: none; }
+
+        .btn-new-room {
+            background: linear-gradient(45deg, #b91c1c, #7f1d1d);
+            color: white;
+            border: 1px solid #ef4444;
+            padding: 15px;
+            font-family: inherit;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.2s;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+        .btn-new-room:hover { transform: scale(1.02); background: linear-gradient(45deg, #dc2626, #991b1b); box-shadow: 0 0 15px rgba(220, 38, 38, 0.5); }
+
+        /* --- GAME CONTAINER (Nuclear Option) --- */
+        #game-wrapper {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            display: none;
+            z-index: 100;
+        }
+
+        #controls {
+            position: absolute;
+            top: 20px; right: 20px;
+            z-index: 999999;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-action {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 1.5rem;
+            font-family: 'Teko', sans-serif;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-action:hover { background: rgba(80, 80, 80, 0.9); border-color: #aaa; color: #fff; }
+
+        /* Background ambients */
+        .ambient-light {
+            position: fixed;
+            width: 80vw; height: 80vh;
+            border-radius: 50%;
+            filter: blur(150px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .light-red { top: -20vh; left: -20vw; background: rgba(220, 38, 38, 0.08); }
+        .light-blue { bottom: -20vh; right: -20vw; background: rgba(56, 189, 248, 0.06); }
+    </style>
+
+    <script>
+        var EJS_player = '#game-container';
+        var EJS_biosUrl = ''; 
+        var EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/ethanaobrien/emulatorjs@main/data/';
+        var EJS_color = '#00ff9d';
+        var EJS_startOnLoaded = true;
+        var EJS_core = 'snes'; // Por defecto ponemos Super Nintendo
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+    <!-- Ambient Background Lights -->
+    <div class="ambient-light light-red"></div>
+    <div class="ambient-light light-blue"></div>
+
+    <!-- MAIN UI: BIBLIOTECA -->
+    <div id="library-view">
+        <h1 class="title">BIBLIOTECA DE LEYENDAS RETRO</h1>
+
+        <!-- DASHBOARD CONTAINER (From retro.html) -->
+        <div class="dashboard-container">
+            <div class="game-screen">
+                <p class="game-status" id="game-status">SISTEMA PREPARADO<br><br>SELECCIONA UN JUEGO ABAJO</p>
+            </div>
+
+            <div class="controls-panel">
+                <button class="btn-save" onclick="saveGame()"><span>💾</span> GUARDAR ESTADO (F5)</button>
+                <button class="btn-load" onclick="loadGame()"><span>📂</span> CARGAR ESTADO (F8)</button>
+                <div id="save-indicator" style="font-size: 1.2rem; color: #aaa; margin-top: 10px; text-align: center;">Último guardado: Nunca</div>
+                <div id="estado-mando" style="font-size: 0.9em; font-weight: bold; color: gray; margin-top: 15px; border: 1px dashed gray; padding: 10px; text-align: center; border-radius: 5px; font-family: sans-serif;">🎮 MANDO DESCONECTADO<br>(Conecta un mando USB o Bluetooth)</div>
+            </div>
+        </div>
+
+        <div class="section-title">NIVEL 1: COLECCIÓN MAESTRA</div>
+        <div class="bookshelf">
+            <div class="game-cover" onclick="launchGameNuclear('mslug5')">
+                <div class="cover-icon">🔫</div>
+                <div class="cover-title">Metal Slug 5</div>
+                <div class="cover-system">ARCADE</div>
+            </div>
+            <div class="game-cover" onclick="launchGameNuclear('spang')">
+                <div class="cover-icon">🎈</div>
+                <div class="cover-title">Super Pang (PS1 HQ)</div>
+                <div class="cover-system">PS1</div>
+            </div>
+            <div class="game-cover" onclick="launchGameNuclear('smw')">
+                <div class="cover-icon">🦖</div>
+                <div class="cover-title">Super Mario World</div>
+                <div class="cover-system">SNES</div>
+            </div>
+            <div class="game-cover" onclick="launchGameNuclear('rayman')">
+                <div class="cover-icon">💿</div>
+                <div class="cover-title">Rayman</div>
+                <div class="cover-system">PS1</div>
+            </div>
+        </div>
+
+        <div class="section-title">SALAS ABIERTAS</div>
+        <div class="salas-grid" id="rooms-grid">
+            <div class="sala-card">
+                <div class="sala-info">
+                    <h4>SALA MADRID</h4>
+                    <p>Super Mario World</p>
+                    <div class="sala-players">3/4</div>
+                    <div class="voice-panel">
+                        <button class="btn-voice" onclick="iniciarVoz()">🎤 Conectar Voz</button>
+                        <button class="btn-mute" onclick="mutearVoz()">🔇 Mutear</button>
+                        <span id="estado-voz" style="font-size: 1em; color: gray; font-family: monospace; font-weight: bold;">Voz: Desconectada</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sala-card">
+                <div class="sala-info">
+                    <h4>SALA ALCALÁ</h4>
+                    <p>Metal Slug 5</p>
+                    <div class="sala-players">1/2</div>
+                </div>
+            </div>
+            <button class="btn-new-room" onclick="addRoom()">
+                <span>➕</span> CREAR NUEVA SALA
+            </button>
+        </div>
+    </div>
+
+    <!-- EMBEDDED GAME WRAPPER -->
+    <div id="game-wrapper">
+        <div id="controls">
+            <button class="btn-action" onclick="backToLibrary()">
+                <span>🔙</span> VOLVER AL MENÚ
+            </button>
+            <button class="btn-action" onclick="forceFullscreen()">
+                <span>📺</span> PANTALLA COMPLETA
+            </button>
+        </div>
+        <!-- El div de EmulatorJS se creará dinámicamente aquí -->
+    </div>
+
+    <script src="http://10.214.4.186:3000/socket.io/socket.io.js"></script>
+    <script>
+        // -- Save System Logic --
+        function saveGame() {
+            const timestamp = new Date().toLocaleTimeString();
+            localStorage.setItem('retroSave', 'Progreso Guardado a las ' + timestamp);
+            document.getElementById('save-indicator').innerText = 'Último guardado: ' + timestamp;
+            alert('Partida guardada localmente con éxito.');
+        }
+
+        function loadGame() {
+            const data = localStorage.getItem('retroSave');
+            if (data) {
+                document.getElementById('game-status').innerHTML = 'CARGANDO...<br><br>' + data;
+                alert('Cargando progreso...');
+            } else {
+                alert('No hay partidas guardadas en este equipo.');
+            }
+        }
+
+        // -- Nuclear Game Constructor Logic --
+        function launchGameNuclear(gameId) {
+            // 1. Hide Library, Show Canvas Wrapper
+            document.getElementById('library-view').style.display = 'none';
+            let wrapper = document.getElementById('game-wrapper');
+            wrapper.style.display = 'block';
+
+            // 2. Destroy completely if exists
+            let oldEjsContainer = document.getElementById('ejs-dynamic-container');
+            if (oldEjsContainer) {
+                oldEjsContainer.remove();
+            }
+
+            // 3. Rebuild with explicit strict dimensions
+            let ejsContainer = document.createElement('div');
+            ejsContainer.id = 'ejs-dynamic-container';
+            ejsContainer.style.width = '100vw';
+            ejsContainer.style.height = '100vh';
+            ejsContainer.style.display = 'block';
+            ejsContainer.style.backgroundColor = '#000';
+            ejsContainer.style.position = 'absolute';
+            ejsContainer.style.top = '0';
+            ejsContainer.style.left = '0';
+            ejsContainer.style.zIndex = '50'; // Below controls (999999)
+
+            wrapper.appendChild(ejsContainer);
+
+            // 4. Configure EmulatorJS
+            window.EJS_player = '#ejs-dynamic-container';
+            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+            window.EJS_color = '#d4af37';
+            window.EJS_language = 'en-US';
+            window.EJS_startOnLoaded = true;
+
+            switch (gameId) {
+                case 'mslug5':
+                    window.EJS_core = 'fbneo';
+                    window.EJS_gameUrl = 'juegos/mslug5.zip';
+                    window.EJS_biosUrl = 'juegos/neogeo.zip';
+                    break;
+                case 'spang':
+                    window.EJS_core = 'psx';
+                    window.EJS_gameUrl = 'juegos/superpang.chd';
+                    window.EJS_biosUrl = '';
+                    break;
+                case 'smw':
+                    window.EJS_core = 'snes';
+                    window.EJS_gameUrl = 'juegos/smw.zip';
+                    window.EJS_biosUrl = '';
+                    break;
+                case 'rayman':
+                    window.EJS_core = 'psx';
+                    window.EJS_gameUrl = 'juegos/Rayman.chd';
+                    window.EJS_biosUrl = '';
+                    break;
+            }
+
+            // 5. Force Reflow and Inject Motor
+            setTimeout(function() {
+                console.log("Incentivando EmulatorJS en Sandbox...");
+                let script = document.createElement('script');
+                script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+                document.body.appendChild(script);
+            }, 50);
+        }
+
+        function backToLibrary() {
+            window.location.reload();
+        }
+
+        function forceFullscreen() {
+            let elem = document.getElementById('ejs-dynamic-container');
+            if (elem) {
+                if (elem.requestFullscreen) elem.requestFullscreen();
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+            }
+        }
+
+        // --- CLIENTE SOCKET.IO Y WEBRTC ---
+        let localStream = null;
+        let peerConnection = null;
+        let socket = null;
+        
+        const servers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+        async function iniciarVoz(e) {
+            const currentEvent = e || window.event;
+            const btnVoz = currentEvent.target; // Captura el botón pulsado
+            const estadoVoz = btnVoz.parentElement.nextElementSibling; // El texto de estado
+
+            try {
+                // 1. Pedir micrófono
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                alert("🎤 Micrófono activado. Conectando con la sala...");
+                btnVoz.style.background = "var(--neon-green)";
+                btnVoz.innerText = "🎤 CONECTADO";
+                
+                // 2. Crear conexión P2P
+                peerConnection = new RTCPeerConnection(servers);
+                
+                // 3. Añadir mi voz a la conexión
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+
+                // 4. Escuchar la voz del compañero
+                peerConnection.ontrack = (event) => {
+                    const audioRemoto = new Audio();
+                    audioRemoto.srcObject = event.streams[0];
+                    audioRemoto.play();
+                };
+
+                // 5. Señalización: Enviar rutas (ICE Candidates) al telefonista
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate && socket) {
+                        socket.emit('enviar-señal', { tipo: 'candidato', candidato: event.candidate });
+                    }
+                };
+
+                // 6. Crear la "Llamada" (Oferta)
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                if (socket) socket.emit('enviar-señal', { tipo: 'oferta', oferta: offer });
+                
+                let estadoSpan = document.getElementById('estado-voz') || document.querySelector('.estado-voz');
+                if(estadoSpan) {
+                    estadoSpan.innerText = "Voz: EN LÍNEA";
+                    estadoSpan.style.color = "#00ff9d";
+                }
+
+            } catch (error) {
+                console.error("Error crítico de micro:", error);
+                // CHIVATO VISUAL SI HAY BLOQUEO
+                btnVoz.style.background = "#550000";
+                btnVoz.innerText = "❌ MICRO BLOQUEADO";
+                alert("⚠️ EL NAVEGADOR HA BLOQUEADO EL MICRÓFONO.\n\nMotivo probable: Estás en una red HTTP no segura. El móvil requiere HTTPS para activar la voz.");
+            }
+        }
+
+        // Comprobamos si el "telefonista" (Socket.io) está disponible antes de conectarnos
+        if (typeof io !== 'undefined') {
+            socket = io('http://10.214.4.186:3000'); // Conectamos con la centralita local
+
+            // 7. El telefonista nos pasa mensajes del otro jugador
+            socket.on('recibir-señal', async (datos) => {
+                if (!peerConnection) return;
+                
+                if (datos.tipo === 'oferta') {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(datos.oferta));
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    socket.emit('enviar-señal', { tipo: 'respuesta', respuesta: answer });
+                } else if (datos.tipo === 'respuesta') {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(datos.respuesta));
+                } else if (datos.tipo === 'candidato') {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(datos.candidato));
+                }
+            });
+
+            socket.on('sala-nueva-creada', (datosSala) => {
+                renderizarSala(datosSala);
+            });
+        } else {
+            console.warn("⚠️ Servidor de voz no detectado. El chat P2P está desactivado, pero los juegos funcionarán offline.");
+        }
+
+        function mutearVoz() {
+            if (localStream) {
+                localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled;
+                alert(localStream.getAudioTracks()[0].enabled ? "🔊 Micrófono Abierto" : "🔇 Micrófono Silenciado");
+            }
+        }
+
+        // --- CREADOR DINÁMICO DE SALAS Y SINCRONIZACIÓN ---
+        function addRoom() {
+            let overlay = document.createElement('div');
+            overlay.id = 'modal-crear-sala';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0'; overlay.style.left = '0';
+            overlay.style.width = '100vw'; overlay.style.height = '100vh';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
+            overlay.style.zIndex = '99999';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            
+            overlay.innerHTML = `
+                <div style="background: #111; padding: 30px; border: 2px solid var(--neon-blue); border-radius: 10px; width: 400px; text-align: center;">
+                    <h2 style="color: var(--neon-green); font-family: 'Press Start 2P', cursive; font-size: 1rem; margin-bottom: 20px;">CREAR NUEVA SALA</h2>
+                    
+                    <input type="text" id="input-nombre-sala" placeholder="Nombre de la sala..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
+                    
+                    <select id="juego-sala" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
+                        <option value="juegos/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
+                        <option value="juegos/mslug5.zip" data-core="fbneo" data-bios="juegos/neogeo.zip">Metal Slug 5 (Arcade)</option>
+                        <option value="juegos/smw.zip" data-core="snes" data-bios="">Super Mario World (SNES)</option>
+                        <option value="juegos/Rayman.chd" data-core="psx" data-bios="">Rayman (PS1)</option>
+                    </select>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: space-between;">
+                        <button onclick="document.getElementById('modal-crear-sala').remove()" style="background: #555; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-family: 'Teko', sans-serif; font-size: 1.2rem;">CANCELAR</button>
+                        <button onclick="confirmarAddRoom()" style="background: var(--neon-blue); color: black; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; font-family: 'Teko', sans-serif; font-size: 1.2rem;">CREAR SALA</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function confirmarAddRoom() {
+            const nameInput = document.getElementById('input-nombre-sala').value;
+            const selectEl = document.getElementById('juego-sala');
+            if(!nameInput) return;
+            
+            const name = nameInput;
+            const romUrl = selectEl.value;
+            const core = selectEl.options[selectEl.selectedIndex].getAttribute('data-core');
+            const biosUrl = selectEl.options[selectEl.selectedIndex].getAttribute('data-bios') || '';
+            const game = selectEl.options[selectEl.selectedIndex].text.split(' (')[0];
+
+            const datosSala = { nombre: name, juego: game, romUrl: romUrl, core: core, biosUrl: biosUrl, id: Date.now() };
+            
+            document.getElementById('modal-crear-sala').remove();
+            
+            // 1. Pintarla en mi pantalla
+            renderizarSala(datosSala);
+            
+            // 2. Avisar al servidor para que la pinte en las pantallas de los demás
+            if (socket) socket.emit('crear-sala', datosSala);
+        }
+
+        // Función que dibuja la tarjeta HTML (la usamos todos)
+        function renderizarSala(datosSala) {
+            const grid = document.getElementById('rooms-grid');
+            const newRoom = document.createElement('div');
+            newRoom.className = 'sala-card';
+            newRoom.innerHTML = `
+                <div class="sala-info">
+                    <h4>${datosSala.nombre}</h4>
+                    <p>Juego: ${datosSala.juego}</p>
+                    <div class="sala-players">1/4</div>
+                    <div class="voice-panel">
+                        <button class="btn-voice" onclick="iniciarVoz()">🎤 VOZ</button>
+                        <button class="btn-mute" onclick="mutearVoz()">🔇 MUTE</button>
+                        <span class="estado-voz" style="font-size: 1em; color: gray; font-family: monospace; font-weight: bold;">Voz: Desconectada</span>
+                    </div>
+                </div>
+                <button onclick="entrarSala('${datosSala.nombre}', '${datosSala.juego}', '${datosSala.romUrl}', '${datosSala.core}', '${datosSala.biosUrl || ''}')" style="width: 100%; margin-top: 15px; background: var(--neon-blue); color: black; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: sans-serif; font-size: 1.1em; transition: 0.1s transform;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">➡️ ENTRAR A SALA</button>
+            `;
+            // Insertar justo antes del botón de Crear Sala
+            const btnNuevo = document.querySelector('.btn-new-room');
+            if (btnNuevo && btnNuevo.parentNode === grid) {
+                grid.insertBefore(newRoom, btnNuevo);
+            } else {
+                grid.appendChild(newRoom);
+            }
+        }
+
+        // Listener reubicado dentro de bloque protegido
+
+        // 4. Acción de entrar al Lobby de la Sala
+        // 4. Acción de entrar al Lobby de la Sala
+        // 4. Acción de entrar al Lobby de la Sala
+        async function entrarSala(nombreSala, nombreJuego, romUrl, core, biosUrl) {
+            console.log("Iniciando secuencia de entrada a sala:", nombreSala);
+            
+            let contenedorModal = document.getElementById('pantalla-emulador-modal');
+            if (!contenedorModal) {
+                contenedorModal = document.createElement('div');
+                contenedorModal.id = 'pantalla-emulador-modal';
+                // Estilos para que cubra toda la pantalla por encima de la web
+                contenedorModal.style.position = 'fixed';
+                contenedorModal.style.top = '0';
+                contenedorModal.style.left = '0';
+                contenedorModal.style.width = '100vw';
+                contenedorModal.style.height = '100vh';
+                contenedorModal.style.backgroundColor = 'rgba(0,0,0,0.95)'; // Fondo casi negro
+                contenedorModal.style.zIndex = '9999';
+                contenedorModal.style.display = 'flex';
+                contenedorModal.style.flexDirection = 'column';
+                contenedorModal.style.alignItems = 'center';
+                contenedorModal.style.justifyContent = 'center';
+                document.body.appendChild(contenedorModal);
+            }
+
+            // Inyectamos el emulador Y ELIMINAMOS LA RANURA FILE UPLOAD (Auto-arranque)
+            contenedorModal.innerHTML = `
+                <div style="position: absolute; top: 20px; left: 30px; display: flex; gap: 10px;">
+                    <button onclick="iniciarVoz(event)" style="background: #cc0000; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 1em; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #880000;">🎤 CONECTAR VOZ</button>
+                    <button onclick="mutearVoz()" style="background: #555; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 1em; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #222;">🔇 MUTE</button>
+                </div>
+                <button onclick="document.getElementById('pantalla-emulador-modal').style.display='none'; window.location.reload();" style="position: absolute; top: 20px; right: 30px; background: #cc0000; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 1.2em; cursor: pointer; border-radius: 5px; z-index: 10000;">❌ SALIR DE LA SALA</button>
+                
+                <h2 style="color: var(--neon-green, #00ff9d); margin-bottom: 5px; text-shadow: 0 0 10px rgba(0,255,157,0.5); z-index: 10000; position: relative;">SALA: ${nombreSala}</h2>
+                <h3 style="color: white; margin-top: 0; margin-bottom: 20px; z-index: 10000; position: relative;">JUEGO: ${nombreJuego}</h3>
+                
+                <div id="game-container" style="width: 80vw; height: 80vh; max-width: 1024px; max-height: 768px; background: black; box-shadow: 0 0 20px rgba(0,0,0,0.8);"></div>
+            `;
+            
+            // Mostramos la pantalla
+            contenedorModal.style.display = 'flex';
+
+            console.log("🧹 Iniciando desinfección total de memoria...");
+            
+            // 1. Borramos las bases de datos IndexedDB (donde se esconden los ZIPs viejos)
+            const dbs = ['emulatorjs', 'EJS_CACHE', 'retroarch', 'BASE_DATA'];
+            dbs.forEach(db => window.indexedDB.deleteDatabase(db));
+
+            // 2. Vaciamos el Cache Storage del navegador
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(key => caches.delete(key)));
+            }
+
+            console.log("🚀 Memoria limpia. Forzando carga del archivo nuevo...");
+
+            // 3. Configuramos el emulador
+            window.EJS_player = '#game-container';
+            window.EJS_gameUrl = romUrl; // Sin añadidos de tiempo para no romper la extracción de PSX
+            window.EJS_core = core;
+            window.EJS_biosUrl = biosUrl || ''; 
+            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/latest/data/';
+            window.EJS_color = '#00ff9d';
+            window.EJS_startOnLoaded = true;
+
+            // Debug para confirmar carga limpia con Extensiones Reales
+            console.log("URL enviada al emulador (Limpia):", window.EJS_gameUrl);
+            console.log("BIOS enviada:", window.EJS_biosUrl);
+            console.log("Core FINAL enviado:", window.EJS_core);
+
+            // 4. Inyectamos el script del motor
+            const oldScript = document.getElementById('ejs-script');
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement('script');
+            script.id = 'ejs-script';
+            script.src = 'https://cdn.emulatorjs.org/latest/data/loader.js';
+            script.crossOrigin = 'anonymous';
+            document.body.appendChild(script);
+        }
+
+        // --- SOPORTE PARA MANDOS FÍSICOS (GAMEPAD API) ---
+        let bucleMandoActivo = false;
+        let btnGuardarPulsado = false;
+        let btnCargarPulsado = false;
+
+        window.addEventListener("gamepadconnected", (evento) => {
+            const mando = evento.gamepad;
+            const panelMando = document.getElementById('estado-mando');
+            panelMando.innerHTML = `🎮 CONECTADO:<br>${mando.id}`;
+            panelMando.style.color = "var(--neon-green)";
+            panelMando.style.border = "1px solid var(--neon-green)";
+            
+            if (!bucleMandoActivo) {
+                bucleMandoActivo = true;
+                leerBotonesMando();
+            }
+        });
+
+        window.addEventListener("gamepaddisconnected", (evento) => {
+            const panelMando = document.getElementById('estado-mando');
+            panelMando.innerHTML = "🎮 MANDO DESCONECTADO<br>(Conecta un mando USB o Bluetooth)";
+            panelMando.style.color = "gray";
+            panelMando.style.border = "1px dashed gray";
+            bucleMandoActivo = false;
+        });
+
+        function leerBotonesMando() {
+            if (!bucleMandoActivo) return;
+            
+            const mandos = navigator.getGamepads();
+            const mando1 = mandos[0]; // Cogemos el primer mando conectado
+            
+            if (mando1) {
+                // Botón 4 suele ser LB o L1 (Guardar Partida)
+                if (mando1.buttons[4].pressed && !btnGuardarPulsado) {
+                    saveGame();
+                    btnGuardarPulsado = true;
+                } else if (!mando1.buttons[4].pressed) {
+                    btnGuardarPulsado = false;
+                }
+                
+                // Botón 5 suele ser RB o R1 (Cargar Partida)
+                if (mando1.buttons[5].pressed && !btnCargarPulsado) {
+                    loadGame();
+                    btnCargarPulsado = true;
+                } else if (!mando1.buttons[5].pressed) {
+                    btnCargarPulsado = false;
+                }
+            }
+            
+            // El bucle se repite 60 veces por segundo para leer los botones
+            requestAnimationFrame(leerBotonesMando);
+        }
+    </script>
+</body>
+</html>
