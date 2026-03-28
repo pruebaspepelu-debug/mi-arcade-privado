@@ -264,6 +264,11 @@
                 <div class="cover-title">Rayman</div>
                 <div class="cover-system">PS1</div>
             </div>
+            <div class="game-cover" onclick="launchGameNuclear('ctr')">
+                <div class="cover-icon">🏎️</div>
+                <div class="cover-title">CTR (Crash Team Racing)</div>
+                <div class="cover-system">PS1</div>
+            </div>
         </div>
 
         <div class="section-title">SALAS ABIERTAS</div>
@@ -306,7 +311,7 @@
         <!-- El div de EmulatorJS se creará dinámicamente aquí -->
     </div>
 
-    <script src="http://10.214.4.186:3000/socket.io/socket.io.js"></script>
+    <script src="https://mi-broker-publico.com/socket.io/socket.io.js"></script>
     <script>
         // -- Save System Logic --
         function saveGame() {
@@ -368,7 +373,7 @@
                     break;
                 case 'spang':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'juegos/superpang.chd';
+                    window.EJS_gameUrl = 'https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/superpang.chd';
                     window.EJS_biosUrl = '';
                     break;
                 case 'smw':
@@ -378,7 +383,12 @@
                     break;
                 case 'rayman':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'juegos/Rayman.chd';
+                    window.EJS_gameUrl = 'https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/Rayman.chd';
+                    window.EJS_biosUrl = '';
+                    break;
+                case 'ctr':
+                    window.EJS_core = 'psx';
+                    window.EJS_gameUrl = 'https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/ctr.chd';
                     window.EJS_biosUrl = '';
                     break;
             }
@@ -468,7 +478,7 @@
 
         // Comprobamos si el "telefonista" (Socket.io) está disponible antes de conectarnos
         if (typeof io !== 'undefined') {
-            socket = io('http://10.214.4.186:3000'); // Conectamos con la centralita local
+            socket = io('https://mi-broker-publico.com'); // Conectamos con el broker público
 
             // 7. El telefonista nos pasa mensajes del otro jugador
             socket.on('recibir-señal', async (datos) => {
@@ -520,10 +530,10 @@
                     <input type="text" id="input-nombre-sala" placeholder="Nombre de la sala..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
                     
                     <select id="juego-sala" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
-                        <option value="juegos/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
+                        <option value="https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
+                        <option value="https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/Rayman.chd" data-core="psx">Rayman (PS1 HQ)</option>
+                        <option value="https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/ctr.chd" data-core="psx">CTR: Crash Team Racing (PS1 HQ)</option>
                         <option value="juegos/mslug5.zip" data-core="fbneo" data-bios="juegos/neogeo.zip">Metal Slug 5 (Arcade)</option>
-                        <option value="juegos/smw.zip" data-core="snes" data-bios="">Super Mario World (SNES)</option>
-                        <option value="juegos/Rayman.chd" data-core="psx" data-bios="">Rayman (PS1)</option>
                     </select>
                     
                     <div style="display: flex; gap: 10px; justify-content: space-between;">
