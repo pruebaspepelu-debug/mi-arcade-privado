@@ -360,7 +360,7 @@
 
             // 4. Configure EmulatorJS
             window.EJS_player = '#ejs-dynamic-container';
-            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+            window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/ethanaobrien/emulatorjs@main/data/';
             window.EJS_color = '#d4af37';
             window.EJS_language = 'en-US';
             window.EJS_startOnLoaded = true;
@@ -397,7 +397,7 @@
             setTimeout(function() {
                 console.log("Incentivando EmulatorJS en Sandbox...");
                 let script = document.createElement('script');
-                script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+                script.src = 'https://cdn.jsdelivr.net/gh/ethanaobrien/emulatorjs@main/data/loader.js';
                 document.body.appendChild(script);
             }, 50);
         }
@@ -657,7 +657,7 @@
             window.EJS_gameUrl = romUrl; // Sin añadidos de tiempo para no romper la extracción de PSX
             window.EJS_core = core;
             window.EJS_biosUrl = biosUrl || ''; 
-            window.EJS_pathtodata = 'https://cdn.emulatorjs.org/latest/data/';
+            window.EJS_pathtodata = 'https://cdn.jsdelivr.net/gh/ethanaobrien/emulatorjs@main/data/';
             window.EJS_color = '#00ff9d';
             window.EJS_startOnLoaded = true;
 
@@ -672,7 +672,7 @@
 
             const script = document.createElement('script');
             script.id = 'ejs-script';
-            script.src = 'https://cdn.emulatorjs.org/latest/data/loader.js';
+            script.src = 'https://cdn.jsdelivr.net/gh/ethanaobrien/emulatorjs@main/data/loader.js';
             script.crossOrigin = 'anonymous';
             document.body.appendChild(script);
         }
