@@ -90,38 +90,31 @@
             <span class="section-title">THE CLASSICS</span>
             <div class="carousel">
                 <div class="card card-juego" onclick="launchGameNuclear('ctr')" style="background: #111;">
-                    <img src="https://via.placeholder.com/300x400/ff7e5f/ffffff?text=CTR" alt="Crash Team Racing">
+                    <img src="./unnamed.jpg" alt="Crash Team Racing">
                     <div class="card-content">
                         <p class="card-title">Crash Team Racing</p>
                         <p class="card-subtitle">PS1</p>
                     </div>
                 </div>
                 <div class="card card-juego" onclick="launchGameNuclear('rayman')" style="background: #111;">
-                    <img src="https://via.placeholder.com/300x400/8e2de2/ffffff?text=Rayman" alt="Rayman">
+                    <img src="./rayman.jpg" alt="Rayman">
                     <div class="card-content">
                         <p class="card-title">Rayman</p>
                         <p class="card-subtitle">PS1</p>
                     </div>
                 </div>
                 <div class="card card-juego" onclick="launchGameNuclear('spang')" style="background: #111;">
-                    <img src="https://via.placeholder.com/300x400/11998e/ffffff?text=Super+Pang" alt="Super Pang">
+                    <img src="./superpang.jpg" alt="Super Pang">
                     <div class="card-content">
                         <p class="card-title">Super Pang</p>
                         <p class="card-subtitle">PS1 HQ</p>
                     </div>
                 </div>
                 <div class="card card-juego" onclick="launchGameNuclear('smw')" style="background: #111;">
-                    <img src="https://via.placeholder.com/300x400/f12711/ffffff?text=Mario+World" alt="Super Mario World">
+                    <img src="./Mario.jpg" alt="Super Mario World">
                     <div class="card-content">
                         <p class="card-title">Super Mario World</p>
                         <p class="card-subtitle">SNES</p>
-                    </div>
-                </div>
-                <div class="card card-juego" onclick="launchGameNuclear('mslug5')" style="background: #111;">
-                    <img src="https://via.placeholder.com/300x400/2b5876/ffffff?text=Metal+Slug" alt="Metal Slug 5">
-                    <div class="card-content">
-                        <p class="card-title">Metal Slug 5</p>
-                        <p class="card-subtitle">ARCADE</p>
                     </div>
                 </div>
             </div>
@@ -173,13 +166,6 @@
                             <button class="btn-mute" onclick="mutearVoz()">🔇 Mutear</button>
                             <span id="estado-voz" style="font-size: 1em; color: gray; font-family: monospace; font-weight: bold;">Voz: Desconectada</span>
                         </div>
-                    </div>
-                </div>
-                <div class="sala-card">
-                    <div class="sala-info">
-                        <h4>SALA ALCALÁ</h4>
-                        <p>Metal Slug 5</p>
-                        <div class="sala-players">1/2</div>
                     </div>
                 </div>
                 <button class="btn-new-room" onclick="addRoom()">
@@ -257,11 +243,6 @@
             window.EJS_startOnLoaded = true;
 
             switch (gameId) {
-                case 'mslug5':
-                    window.EJS_core = 'fbneo';
-                    window.EJS_gameUrl = 'juegos/mslug5.zip';
-                    window.EJS_biosUrl = 'juegos/neogeo.zip';
-                    break;
                 case 'spang':
                     window.EJS_core = 'psx';
                     window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/superpang.chd';
@@ -424,7 +405,6 @@
                         <option value="https://archive.org/download/ctr_20260328/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
                         <option value="https://archive.org/download/ctr_20260328/Rayman.chd" data-core="psx">Rayman (PS1 HQ)</option>
                         <option value="https://archive.org/download/ctr_20260328/ctr.chd" data-core="psx">CTR: Crash Team Racing (PS1 HQ)</option>
-                        <option value="juegos/mslug5.zip" data-core="fbneo" data-bios="juegos/neogeo.zip">Metal Slug 5 (Arcade)</option>
                     </select>
                     
                     <div style="display: flex; gap: 10px; justify-content: space-between;">
