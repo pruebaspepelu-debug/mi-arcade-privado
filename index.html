@@ -9,204 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Arcade Privado - Biblioteca</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Teko:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at top, #1a0f18 0%, #050510 100%);
-            color: #fff;
-            overflow-x: hidden;
-            font-family: 'Teko', sans-serif;
-        }
-
-        /* --- STYLES FOR BIBLIOTECA --- */
-        #library-view {
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        h1.title {
-            text-align: center;
-            font-family: 'Press Start 2P', cursive;
-            color: #d4af37; /* Burnished gold */
-            text-shadow: 0 4px 10px rgba(212, 175, 55, 0.4), 0 0 20px rgba(200, 30, 30, 0.8);
-            font-size: 1.5rem; /* Adjusted for Press Start 2P proportions */
-            margin-bottom: 50px;
-            letter-spacing: 2px;
-            line-height: 1.5;
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-            color: #e2e8f0;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-            padding-bottom: 5px;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        /* Console Dashboard & Save System */
-        :root { --neon-green: #00ff9d; --neon-blue: #00d4ff; }
-        .dashboard-container { display: flex; gap: 20px; padding: 20px 0; justify-content: center; align-items: stretch; margin-bottom: 40px; }
-        
-        .game-screen { background: #000; width: 640px; height: 480px; border: 5px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 20px rgba(0,212,255,0.2); flex-shrink: 0; }
-        .game-status { color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; text-shadow: 0 0 10px #00d4ff; text-align: center; line-height: 1.5; }
-        
-        .controls-panel { display: flex; flex-direction: column; gap: 15px; justify-content: center; }
-        .btn-save { background: var(--neon-green); color: black; border: none; padding: 15px 25px; font-family: 'Teko', sans-serif; font-size: 1.5rem; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #00a365; transition: transform 0.1s; display: flex; align-items: center; gap: 8px;}
-        .btn-load { background: var(--neon-blue); color: black; border: none; padding: 15px 25px; font-family: 'Teko', sans-serif; font-size: 1.5rem; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 0 #0088a3; transition: transform 0.1s; display: flex; align-items: center; gap: 8px;}
-        .btn-save:active, .btn-load:active { transform: translateY(4px); box-shadow: none; }
-
-
-        /* Bookshelf (Grid) */
-        .bookshelf {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
-            perspective: 1000px;
-        }
-
-        .game-cover {
-            background: linear-gradient(135deg, #2a2a35 0%, #15151e 100%);
-            border: 2px solid #333;
-            border-radius: 8px;
-            aspect-ratio: 3/4;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,150,255,0.05);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .game-cover::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            box-shadow: inset 0 0 30px rgba(100, 200, 255, 0.4);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .game-cover:hover {
-            transform: translateY(-10px) rotateY(4deg) scale(1.05);
-            border-color: #64c8ff;
-            box-shadow: 0 15px 30px rgba(100,200,255,0.2), 0 0 25px rgba(100,200,255,0.15);
-            z-index: 10;
-        }
-        
-        .game-cover:hover::before { opacity: 1; }
-
-        .cover-icon { font-size: 4rem; margin-bottom: 10px; z-index: 1; text-shadow: 0 4px 8px rgba(0,0,0,0.8); }
-        .cover-title { font-size: 1.6rem; font-weight: bold; text-align: center; z-index: 1; color: #fff; line-height: 1.1; padding: 0 15px; }
-        .cover-system { font-size: 1.2rem; color: #d4af37; margin-top: 5px; z-index: 1; letter-spacing: 1px; }
-
-        /* Salas Abiertas Section */
-        .salas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .sala-card {
-            background: rgba(40, 10, 20, 0.6);
-            border: 1px solid #8b0000;
-            border-top: 3px solid #dc2626;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-            transition: background 0.2s;
-            cursor: default;
-        }
-
-        .sala-card:hover { background: rgba(80, 20, 30, 0.8); }
-        
-        .sala-info h4 { margin: 0; font-size: 1.5rem; color: #fca5a5; letter-spacing: 0.5px; }
-        .sala-info p { margin: 0; font-size: 1.3rem; color: #94a3b8; }
-        .sala-players { background: #000; padding: 5px 12px; border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 0.8rem; color: #4ade80; border: 1px solid #333; margin-bottom: 10px; display: inline-block; }
-
-        /* Voice Switch Controls - Retro Radio Style */
-        .voice-panel { margin-top: 10px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); display: flex; gap: 10px; align-items: center; }
-        .btn-voice { background: linear-gradient(to bottom, #cc0000, #880000); color: white; border: 2px solid #330000; padding: 6px 12px; font-family: monospace; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 4px; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3), 0 4px 0 #4a0000; text-transform: uppercase; transition: all 0.1s; }
-        .btn-voice:active { transform: translateY(4px); box-shadow: none; }
-        .btn-mute { background: linear-gradient(to bottom, #777, #444); color: white; border: 2px solid #222; padding: 6px 12px; font-family: monospace; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 4px; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3), 0 4px 0 #1a1a1a; text-transform: uppercase; transition: all 0.1s; }
-        .btn-mute:active { transform: translateY(4px); box-shadow: none; }
-
-        .btn-new-room {
-            background: linear-gradient(45deg, #b91c1c, #7f1d1d);
-            color: white;
-            border: 1px solid #ef4444;
-            padding: 15px;
-            font-family: inherit;
-            font-size: 1.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-weight: bold;
-            transition: all 0.2s;
-            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-        }
-        .btn-new-room:hover { transform: scale(1.02); background: linear-gradient(45deg, #dc2626, #991b1b); box-shadow: 0 0 15px rgba(220, 38, 38, 0.5); }
-
-        /* --- GAME CONTAINER (Nuclear Option) --- */
-        #game-wrapper {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #000;
-            display: none;
-            z-index: 100;
-        }
-
-        #controls {
-            position: absolute;
-            top: 20px; right: 20px;
-            z-index: 999999;
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn-action {
-            background: rgba(30, 30, 30, 0.8);
-            border: 1px solid #555;
-            color: #fff;
-            padding: 10px 20px;
-            font-size: 1.5rem;
-            font-family: 'Teko', sans-serif;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            border-radius: 4px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-action:hover { background: rgba(80, 80, 80, 0.9); border-color: #aaa; color: #fff; }
-
-        /* Background ambients */
-        .ambient-light {
-            position: fixed;
-            width: 80vw; height: 80vh;
-            border-radius: 50%;
-            filter: blur(150px);
-            z-index: 0;
-            pointer-events: none;
-        }
-        .light-red { top: -20vh; left: -20vw; background: rgba(220, 38, 38, 0.08); }
-        .light-blue { bottom: -20vh; right: -20vw; background: rgba(56, 189, 248, 0.06); }
-    </style>
+    <link rel="stylesheet" href="style.css">
 
     <script>
         var EJS_player = '#game-container';
@@ -224,77 +27,165 @@
     <div class="ambient-light light-red"></div>
     <div class="ambient-light light-blue"></div>
 
+    <!-- HEADER NAV -->
+    <nav class="top-nav">
+        <div class="logo">PEPEFLIX RETRO</div>
+        <div class="nav-links">
+            <a href="#">HOME</a>
+            <a href="#">ARCADE</a>
+            <a href="#">MULTIPLAYER</a>
+            <a href="#">ABOUT</a>
+        </div>
+        <div class="user-profile">
+            <span class="username">PEPELU</span>
+            <img src="https://via.placeholder.com/35/ff00ff/ffffff?text=P" alt="User Profile">
+            <span>⚙️</span>
+        </div>
+    </nav>
+
+    <!-- HERO BANNER -->
+    <header class="hero-banner">
+        <div class="hero-content">
+            <h1 class="hero-title">CRASH TEAM RACING</h1>
+            <p class="hero-synopsis">Start your engines! Race against your friends in this chaotic high-speed kart racer featuring your favorite bandicoot characters.</p>
+            <button class="btn-play" onclick="launchGameNuclear('ctr')">
+                <span>▶</span> PLAY NOW
+            </button>
+        </div>
+    </header>
+
     <!-- MAIN UI: BIBLIOTECA -->
-    <div id="library-view">
-        <h1 class="title">BIBLIOTECA DE LEYENDAS RETRO</h1>
+    <div id="library-view" class="library-view">
 
-        <!-- DASHBOARD CONTAINER (From retro.html) -->
-        <div class="dashboard-container">
-            <div class="game-screen">
-                <p class="game-status" id="game-status">SISTEMA PREPARADO<br><br>SELECCIONA UN JUEGO ABAJO</p>
+        <!-- FILA 1: MODOS -->
+        <div class="row-container">
+            <span class="section-title">SELECT YOUR MODE</span>
+            <div class="carousel">
+                <div class="card card-modo" onclick="alert('Single Player mode is under development.')">
+                    <div class="icon-modo">👤</div>
+                    <div class="card-content">
+                        <p class="card-title">Single Player</p>
+                        <p class="card-subtitle">Play at your own pace</p>
+                    </div>
+                </div>
+                <div class="card card-modo" onclick="document.querySelector('#retro-dashboard').style.display='flex'">
+                    <div class="icon-modo">🛋️</div>
+                    <div class="card-content">
+                        <p class="card-title">Local Co-op</p>
+                        <p class="card-subtitle">Plug your USB gamepads</p>
+                    </div>
+                </div>
+                <div class="card card-modo" onclick="document.getElementById('rooms-grid').scrollIntoView({behavior: 'smooth'})">
+                    <div class="icon-modo">🌐</div>
+                    <div class="card-content">
+                        <p class="card-title">Online Battle</p>
+                        <p class="card-subtitle">P2P Multiplayer & Voice</p>
+                    </div>
+                </div>
             </div>
+        </div>
 
+        <!-- FILA 2: CLÁSICOS -->
+        <div class="row-container">
+            <span class="section-title">THE CLASSICS</span>
+            <div class="carousel">
+                <div class="card card-juego" onclick="launchGameNuclear('ctr')" style="background: #111;">
+                    <img src="https://via.placeholder.com/300x400/ff7e5f/ffffff?text=CTR" alt="Crash Team Racing">
+                    <div class="card-content">
+                        <p class="card-title">Crash Team Racing</p>
+                        <p class="card-subtitle">PS1</p>
+                    </div>
+                </div>
+                <div class="card card-juego" onclick="launchGameNuclear('rayman')" style="background: #111;">
+                    <img src="https://via.placeholder.com/300x400/8e2de2/ffffff?text=Rayman" alt="Rayman">
+                    <div class="card-content">
+                        <p class="card-title">Rayman</p>
+                        <p class="card-subtitle">PS1</p>
+                    </div>
+                </div>
+                <div class="card card-juego" onclick="launchGameNuclear('spang')" style="background: #111;">
+                    <img src="https://via.placeholder.com/300x400/11998e/ffffff?text=Super+Pang" alt="Super Pang">
+                    <div class="card-content">
+                        <p class="card-title">Super Pang</p>
+                        <p class="card-subtitle">PS1 HQ</p>
+                    </div>
+                </div>
+                <div class="card card-juego" onclick="launchGameNuclear('smw')" style="background: #111;">
+                    <img src="https://via.placeholder.com/300x400/f12711/ffffff?text=Mario+World" alt="Super Mario World">
+                    <div class="card-content">
+                        <p class="card-title">Super Mario World</p>
+                        <p class="card-subtitle">SNES</p>
+                    </div>
+                </div>
+                <div class="card card-juego" onclick="launchGameNuclear('mslug5')" style="background: #111;">
+                    <img src="https://via.placeholder.com/300x400/2b5876/ffffff?text=Metal+Slug" alt="Metal Slug 5">
+                    <div class="card-content">
+                        <p class="card-title">Metal Slug 5</p>
+                        <p class="card-subtitle">ARCADE</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA 3: LUCHADORES -->
+        <div class="row-container">
+            <span class="section-title">SELECT YOUR FIGHTER</span>
+            <div class="carousel" style="padding: 20px 0;">
+                <div class="card card-avatar">
+                    <img src="https://via.placeholder.com/150/444444/ffffff?text=P1" alt="Jugador 1">
+                </div>
+                <div class="card card-avatar">
+                    <img src="https://via.placeholder.com/150/444444/ffffff?text=P2" alt="Jugador 2">
+                </div>
+                <div class="card card-avatar">
+                    <img src="https://via.placeholder.com/150/444444/ffffff?text=P3" alt="Jugador 3">
+                </div>
+                <div class="card card-avatar">
+                    <img src="https://via.placeholder.com/150/444444/ffffff?text=P4" alt="Jugador 4">
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD SOFÁ LOCAL (HIDDEN BY DEFAULT) -->
+        <div class="dashboard-container" id="retro-dashboard" style="display:none; padding:40px; margin-top:20px; background: rgba(0,0,0,0.5); border-radius:10px;">
+            <div class="game-screen">
+                <p class="game-status" id="game-status">SISTEMA PREPARADO<br><br>SELECCIONA UN CLÁSICO ARRIBA</p>
+            </div>
             <div class="controls-panel">
-                <button class="btn-save" onclick="saveGame()"><span>💾</span> GUARDAR ESTADO (F5)</button>
-                <button class="btn-load" onclick="loadGame()"><span>📂</span> CARGAR ESTADO (F8)</button>
-                <div id="save-indicator" style="font-size: 1.2rem; color: #aaa; margin-top: 10px; text-align: center;">Último guardado: Nunca</div>
+                <button class="btn-save" onclick="saveGame()"><span>💾</span> GUARDAR ESTADO</button>
+                <button class="btn-load" onclick="loadGame()"><span>📂</span> CARGAR ESTADO</button>
+                <div id="save-indicator" style="font-size: 1rem; color: #aaa; margin-top: 10px; text-align: center;">Último guardado: Nunca</div>
                 <div id="estado-mando" style="font-size: 0.9em; font-weight: bold; color: gray; margin-top: 15px; border: 1px dashed gray; padding: 10px; text-align: center; border-radius: 5px; font-family: sans-serif;">🎮 MANDO DESCONECTADO<br>(Conecta un mando USB o Bluetooth)</div>
             </div>
         </div>
 
-        <div class="section-title">NIVEL 1: COLECCIÓN MAESTRA</div>
-        <div class="bookshelf">
-            <div class="game-cover" onclick="launchGameNuclear('mslug5')">
-                <div class="cover-icon">🔫</div>
-                <div class="cover-title">Metal Slug 5</div>
-                <div class="cover-system">ARCADE</div>
-            </div>
-            <div class="game-cover" onclick="launchGameNuclear('spang')">
-                <div class="cover-icon">🎈</div>
-                <div class="cover-title">Super Pang (PS1 HQ)</div>
-                <div class="cover-system">PS1</div>
-            </div>
-            <div class="game-cover" onclick="launchGameNuclear('smw')">
-                <div class="cover-icon">🦖</div>
-                <div class="cover-title">Super Mario World</div>
-                <div class="cover-system">SNES</div>
-            </div>
-            <div class="game-cover" onclick="launchGameNuclear('rayman')">
-                <div class="cover-icon">💿</div>
-                <div class="cover-title">Rayman</div>
-                <div class="cover-system">PS1</div>
-            </div>
-            <div class="game-cover" onclick="launchGameNuclear('ctr')">
-                <div class="cover-icon">🏎️</div>
-                <div class="cover-title">CTR (Crash Team Racing)</div>
-                <div class="cover-system">PS1</div>
-            </div>
-        </div>
-
-        <div class="section-title">SALAS ABIERTAS</div>
-        <div class="salas-grid" id="rooms-grid">
-            <div class="sala-card">
-                <div class="sala-info">
-                    <h4>SALA MADRID</h4>
-                    <p>Super Mario World</p>
-                    <div class="sala-players">3/4</div>
-                    <div class="voice-panel">
-                        <button class="btn-voice" onclick="iniciarVoz()">🎤 Conectar Voz</button>
-                        <button class="btn-mute" onclick="mutearVoz()">🔇 Mutear</button>
-                        <span id="estado-voz" style="font-size: 1em; color: gray; font-family: monospace; font-weight: bold;">Voz: Desconectada</span>
+        <!-- SALAS ONLINE -->
+        <div class="row-container" style="margin-top: 50px;">
+            <span class="section-title">Salas Abiertas Online</span>
+            <div class="salas-grid" id="rooms-grid">
+                <div class="sala-card">
+                    <div class="sala-info">
+                        <h4>SALA MADRID</h4>
+                        <p>Super Mario World</p>
+                        <div class="sala-players">3/4</div>
+                        <div class="voice-panel">
+                            <button class="btn-voice" onclick="iniciarVoz()">🎤 Conectar Voz</button>
+                            <button class="btn-mute" onclick="mutearVoz()">🔇 Mutear</button>
+                            <span id="estado-voz" style="font-size: 1em; color: gray; font-family: monospace; font-weight: bold;">Voz: Desconectada</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="sala-card">
-                <div class="sala-info">
-                    <h4>SALA ALCALÁ</h4>
-                    <p>Metal Slug 5</p>
-                    <div class="sala-players">1/2</div>
+                <div class="sala-card">
+                    <div class="sala-info">
+                        <h4>SALA ALCALÁ</h4>
+                        <p>Metal Slug 5</p>
+                        <div class="sala-players">1/2</div>
+                    </div>
                 </div>
+                <button class="btn-new-room" onclick="addRoom()">
+                    <span>➕</span> CREAR NUEVA SALA
+                </button>
             </div>
-            <button class="btn-new-room" onclick="addRoom()">
-                <span>➕</span> CREAR NUEVA SALA
-            </button>
         </div>
     </div>
 
@@ -373,7 +264,7 @@
                     break;
                 case 'spang':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/superpang.chd';
+                    window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/superpang.chd';
                     window.EJS_biosUrl = '';
                     break;
                 case 'smw':
@@ -383,12 +274,12 @@
                     break;
                 case 'rayman':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/Rayman.chd';
+                    window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/Rayman.chd';
                     window.EJS_biosUrl = '';
                     break;
                 case 'ctr':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/ctr.chd';
+                    window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/ctr.chd';
                     window.EJS_biosUrl = '';
                     break;
             }
@@ -530,9 +421,9 @@
                     <input type="text" id="input-nombre-sala" placeholder="Nombre de la sala..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
                     
                     <select id="juego-sala" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
-                        <option value="https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
-                        <option value="https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/Rayman.chd" data-core="psx">Rayman (PS1 HQ)</option>
-                        <option value="https://github.com/pruebaspepelu-debug/mi-arcade-privado/releases/download/v1.0/ctr.chd" data-core="psx">CTR: Crash Team Racing (PS1 HQ)</option>
+                        <option value="https://archive.org/download/ctr_20260328/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
+                        <option value="https://archive.org/download/ctr_20260328/Rayman.chd" data-core="psx">Rayman (PS1 HQ)</option>
+                        <option value="https://archive.org/download/ctr_20260328/ctr.chd" data-core="psx">CTR: Crash Team Racing (PS1 HQ)</option>
                         <option value="juegos/mslug5.zip" data-core="fbneo" data-bios="juegos/neogeo.zip">Metal Slug 5 (Arcade)</option>
                     </select>
                     
