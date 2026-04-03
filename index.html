@@ -245,22 +245,22 @@
             switch (gameId) {
                 case 'spang':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/superpang.chd';
+                    window.EJS_gameUrl = 'https://garrison-intellective-rosalva.ngrok-free.app/juegos/superpang.chd';
                     window.EJS_biosUrl = '';
                     break;
                 case 'smw':
                     window.EJS_core = 'snes';
-                    window.EJS_gameUrl = 'juegos/smw.zip';
+                    window.EJS_gameUrl = 'https://garrison-intellective-rosalva.ngrok-free.app/juegos/smw.zip';
                     window.EJS_biosUrl = '';
                     break;
                 case 'rayman':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/Rayman.chd';
+                    window.EJS_gameUrl = 'https://garrison-intellective-rosalva.ngrok-free.app/juegos/Rayman.chd';
                     window.EJS_biosUrl = '';
                     break;
                 case 'ctr':
                     window.EJS_core = 'psx';
-                    window.EJS_gameUrl = 'https://archive.org/download/ctr_20260328/ctr.chd';
+                    window.EJS_gameUrl = 'https://garrison-intellective-rosalva.ngrok-free.app/juegos/ctr.chd';
                     window.EJS_biosUrl = '';
                     break;
             }
@@ -402,9 +402,9 @@
                     <input type="text" id="input-nombre-sala" placeholder="Nombre de la sala..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
                     
                     <select id="juego-sala" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: white; border: 1px solid var(--neon-blue); font-family: 'Teko', sans-serif; font-size: 1.2rem; box-sizing: border-box;">
-                        <option value="https://archive.org/download/ctr_20260328/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
-                        <option value="https://archive.org/download/ctr_20260328/Rayman.chd" data-core="psx">Rayman (PS1 HQ)</option>
-                        <option value="https://archive.org/download/ctr_20260328/ctr.chd" data-core="psx">CTR: Crash Team Racing (PS1 HQ)</option>
+                        <option value="https://garrison-intellective-rosalva.ngrok-free.app/juegos/superpang.chd" data-core="psx">Super Pang (PS1 HQ)</option>
+                        <option value="https://garrison-intellective-rosalva.ngrok-free.app/juegos/Rayman.chd" data-core="psx">Rayman (PS1 HQ)</option>
+                        <option value="https://garrison-intellective-rosalva.ngrok-free.app/juegos/ctr.chd" data-core="psx">CTR: Crash Team Racing (PS1 HQ)</option>
                     </select>
                     
                     <div style="display: flex; gap: 10px; justify-content: space-between;">
@@ -549,21 +549,13 @@
         }
 
         // --- SOPORTE PARA MANDOS FÍSICOS (GAMEPAD API) ---
-        let bucleMandoActivo = false;
-        let btnGuardarPulsado = false;
-        let btnCargarPulsado = false;
-
+        // Se ha deshabilitado el mapeo personalizado para permitir los controles originales de PlayStation
         window.addEventListener("gamepadconnected", (evento) => {
             const mando = evento.gamepad;
             const panelMando = document.getElementById('estado-mando');
             panelMando.innerHTML = `🎮 CONECTADO:<br>${mando.id}`;
             panelMando.style.color = "var(--neon-green)";
             panelMando.style.border = "1px solid var(--neon-green)";
-            
-            if (!bucleMandoActivo) {
-                bucleMandoActivo = true;
-                leerBotonesMando();
-            }
         });
 
         window.addEventListener("gamepaddisconnected", (evento) => {
@@ -571,36 +563,7 @@
             panelMando.innerHTML = "🎮 MANDO DESCONECTADO<br>(Conecta un mando USB o Bluetooth)";
             panelMando.style.color = "gray";
             panelMando.style.border = "1px dashed gray";
-            bucleMandoActivo = false;
         });
-
-        function leerBotonesMando() {
-            if (!bucleMandoActivo) return;
-            
-            const mandos = navigator.getGamepads();
-            const mando1 = mandos[0]; // Cogemos el primer mando conectado
-            
-            if (mando1) {
-                // Botón 4 suele ser LB o L1 (Guardar Partida)
-                if (mando1.buttons[4].pressed && !btnGuardarPulsado) {
-                    saveGame();
-                    btnGuardarPulsado = true;
-                } else if (!mando1.buttons[4].pressed) {
-                    btnGuardarPulsado = false;
-                }
-                
-                // Botón 5 suele ser RB o R1 (Cargar Partida)
-                if (mando1.buttons[5].pressed && !btnCargarPulsado) {
-                    loadGame();
-                    btnCargarPulsado = true;
-                } else if (!mando1.buttons[5].pressed) {
-                    btnCargarPulsado = false;
-                }
-            }
-            
-            // El bucle se repite 60 veces por segundo para leer los botones
-            requestAnimationFrame(leerBotonesMando);
-        }
     </script>
 </body>
 </html>
